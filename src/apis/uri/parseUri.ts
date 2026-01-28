@@ -250,10 +250,24 @@ export async function signRequest(
 		// if (returnPath && !(await isIosAppOnMac())) {
 		// 	Linking.openURL(returnPath)
 		// }
-	} catch (err) {
-		console.error(err)
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-        callbackURIWithError(callbackUrl, 'Request cancelled from WebAuth.com Wallet')
+	} catch (err: any) {
+		const errorMsg = err?.message || ''
+
+		// Check if this is a WebAuthn key error
+		if (errorMsg.includes('PUB_WA_') || errorMsg.includes('unknown key type')) {
+			console.error('\nError: WebAuthn keys (PUB_WA_*) cannot sign transactions from the CLI.')
+			console.error('WebAuthn keys are designed for browser-based authentication only.')
+			console.error('\nSolution: Add a K1 key to your account for CLI signing:')
+			console.error('  1. proton key:add (to add a new private key)')
+			console.error('  2. proton permission:link <account> active <public_key>')
+			if (callbackUrl) {
+				callbackURIWithError(callbackUrl, 'WebAuthn keys cannot sign from CLI')
+			}
+		} else {
+			console.error(err)
+			if (callbackUrl) {
+				callbackURIWithError(callbackUrl, 'Request cancelled from WebAuth.com Wallet')
+			}
+		}
 	}
 }
