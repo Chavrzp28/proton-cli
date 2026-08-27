@@ -1,11 +1,9 @@
 import { Command } from "@oclif/command";
-import { CliUx, Flags } from "@oclif/core";
+import { CliUx } from "@oclif/core";
 import { network } from "../../storage/networks";
-import { config } from "../../storage/config";
 import * as inquirer from "inquirer";
-import { ChainDiscoveryService, EP_DISCOVERY, networks } from "../../constants";
+import { ChainDiscoveryService, EP_DISCOVERY } from "../../constants";
 import { nodeApiFilter } from "../../utils/nodeApiFilter";
-import { green } from "colors";
 
 export default class SetEnpoint extends Command {
   static description = "Set current enpoint";
@@ -16,8 +14,7 @@ export default class SetEnpoint extends Command {
 
   async run() {
     const { args } = this.parse(SetEnpoint);
-
-    if (!args.chain) {
+    if (!args.endpoint) {
       const chain = network.network.chain;
       const chainDiscoveryService = EP_DISCOVERY.find(
         (api: ChainDiscoveryService) => api.chain === chain
@@ -39,6 +36,9 @@ export default class SetEnpoint extends Command {
         },
       ]);
       args.endpoint = responses.endpoint;
+    }
+    if(!Array.isArray(args.endpoint)) {
+      args.endpoint = [args.endpoint]
     }
     network.overrideEndpoint(args.endpoint);
   }
