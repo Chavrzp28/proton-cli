@@ -1,5 +1,5 @@
 import { Command } from "@oclif/command";
-import { CliUx, Flags } from "@oclif/core";
+import { CliUx } from "@oclif/core";
 import { network } from "../../storage/networks";
 import { green } from "colors";
 
